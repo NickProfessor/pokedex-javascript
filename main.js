@@ -1,6 +1,44 @@
-fetch("https://pokeapi.co/api/v2/pokemon/charizard")
-  .then((res) => res.json())
-  .then((data) => console.log(data));
+const URL = "https://pokeapi.co/api/v2/pokemon/";
+
+//Pega o pokemon
+const getPokemon = async (id) => {
+  let pokemon;
+  try {
+    const res = await fetch(URL + id);
+    pokemon = await res.json();
+  } catch (error) {
+    console.log("Erro! " + error);
+  }
+
+  return pokemon;
+};
+
+//Pega o nome do pokemon
+const pokemonName = async (id) => {
+  const pokemon = await getPokemon(id);
+  return pokemon.name;
+};
+
+//Pega os ataques
+const listPokemonAtaccks = async (id) => {
+  const pokemon = await getPokemon(id);
+  const listaDeAtaques = await pokemon.moves;
+  return listaDeAtaques;
+};
+
+//Pega ataques específicos
+const pokemonAtaccks = async (id, numeroDeAtaques) => {
+  const ataquesDisponiveis = await listPokemonAtaccks(id);
+  let ataquesDesejados = [];
+  for (let i = 0; i < numeroDeAtaques; i++) {
+    const ataque = ataquesDisponiveis[i];
+    ataquesDesejados.push(ataque);
+  }
+  return ataquesDesejados;
+};
+
+//
+console.log(await pokemonAtaccks(1, 20));
 
 // nome = data.name
 // habilidades = data.abilities
