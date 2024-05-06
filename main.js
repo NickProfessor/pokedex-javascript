@@ -1,5 +1,26 @@
-const URL = "https://pokeapi.co/api/v2/pokemon/";
+const container = document.querySelector(".container");
 
+const URL = "https://pokeapi.co/api/v2/pokemon/";
+const ENCOUNTERS_LOCATION = "/encounters";
+// Fotos do pokemon
+const SPRITES =
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/";
+const BACK_DEFAULT_SPRITE = "/back/";
+const BACK_SHINY = "/back/shiny/";
+const FRONT_SHINY = "/shiny/";
+// dream world usar .svg
+const DREAM_WORLD = "/other/dream-world/";
+const HOME_FRONT_DEFAULT = "/other/home/";
+const HOME_FRONT_SHINY = "/other/home/shiny/";
+const ARTWORK_FRONT_DEFAULT = "/other/official-artwork/";
+const ARTWORK_FRONT_SHINY = "/other/official-artwork/shiny/";
+// showdown usar .gif
+const SHOWDOWN_BACK_DEFAULT = "/other/showdown/back/";
+const SHOWDOWN_BACK_SHINY = "/other/showdown/back/shiny/";
+const SHOWDOWN_FRONT_DEFAULT = "/other/showdown/";
+const SHOWDOWN_FRONT_SHINY = "/other/showdown/shiny/";
+
+// Fim
 //Pega o pokemon
 const getPokemon = async (id) => {
   let pokemon;
@@ -14,13 +35,13 @@ const getPokemon = async (id) => {
 };
 
 //Pega o nome do pokemon
-const pokemonName = async (id) => {
+const getPokemonName = async (id) => {
   const pokemon = await getPokemon(id);
   return pokemon.name;
 };
 
 //Pega os ataques
-const listPokemonAtaccks = async (id) => {
+const getListPokemonAtaccks = async (id) => {
   const pokemon = await getPokemon(id);
   const listaDeAtaques = await pokemon.moves;
   return listaDeAtaques;
@@ -28,17 +49,71 @@ const listPokemonAtaccks = async (id) => {
 
 //Pega ataques específicos
 const pokemonAtaccks = async (id, numeroDeAtaques) => {
-  const ataquesDisponiveis = await listPokemonAtaccks(id);
+  const ataquesDisponiveis = await getListPokemonAtaccks(id);
   let ataquesDesejados = [];
   for (let i = 0; i < numeroDeAtaques; i++) {
     const ataque = ataquesDisponiveis[i];
     ataquesDesejados.push(ataque);
   }
-  return ataquesDesejados;
+  console.log(ataquesDesejados);
+  return getPokemonAtaccksDetails(ataquesDesejados);
 };
 
-//
-console.log(await pokemonAtaccks(1, 20));
+//Pega detalhes dos ataques específicos
+const getPokemonAtaccksDetails = async (listaDosAtaques) => {
+  const nomeDosAtaques = [];
+  const urlDosAtaques = [];
+  const detalhes = { nomeDosAtaques, urlDosAtaques };
+  listaDosAtaques.forEach((ataque) => {
+    nomeDosAtaques.push(ataque.move.name);
+    urlDosAtaques.push(ataque.move.url);
+  });
+
+  return detalhes;
+};
+//Pega  o local de encontro
+const getLocationEncounterPokemon = async (id) => {
+  let location;
+  try {
+    const res = await fetch(URL + id + ENCOUNTERS_LOCATION);
+    const data = await res.json();
+    location = data.map((local) => {
+      const nameLocal = local.location_area.name;
+      return nameLocal;
+    });
+  } catch (error) {
+    console.log("Erro! " + error);
+  }
+
+  return location;
+};
+
+const getImagesPokemon = (id) => {
+  const padraoCostas = SPRITES + BACK_DEFAULT_SPRITE + id + ".png";
+  const padrao = SPRITES + id + ".png";
+  const shinyCostas = SPRITES + BACK_SHINY + id + ".png";
+  const shiny = SPRITES + FRONT_SHINY + id + ".png";
+  const dreamWorld = SPRITES + DREAM_WORLD + id + ".svg";
+  const homePadraoFrente = SPRITES + HOME_FRONT_DEFAULT + id + ".png";
+  const homeShinyFrente = SPRITES + HOME_FRONT_SHINY + id + ".png";
+  const artWorkPadraoFrente = SPRITES + ARTWORK_FRONT_DEFAULT + id + ".png";
+  const artWorkShinyFrente = SPRITES + ARTWORK_FRONT_SHINY + id + ".png";
+  const todasAsFotos = {
+    padraoCostas,
+    padrao,
+    shinyCostas,
+    shiny,
+    dreamWorld,
+    homePadraoFrente,
+    homeShinyFrente,
+    artWorkPadraoFrente,
+    artWorkShinyFrente,
+  };
+  return todasAsFotos;
+};
+
+const fotos = getImagesPokemon(300);
+container.innerHTML += `<img src=${fotos.padraoCostas}>`;
 
 // nome = data.name
 // habilidades = data.abilities
